@@ -3,46 +3,89 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --border: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --radius: 0.625rem;
+  /* PUP Maroon (#800000) & Golden Yellow (#FFDF00) & Goldenrod (#DAA520) Theme */
+  --pup-maroon: #800000;
+  --pup-maroon-dark: #600000;
+  --pup-maroon-light: #991b1b;
+  --pup-gold: #FFDF00;
+  --pup-gold-dark: #DAA520;
+  --pup-gold-light: #FFF4B8;
+
+  --background: #fdfbf7;
+  --foreground: #1c1917;
+
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+
+  --primary: #800000;
+  --primary-foreground: #ffffff;
+
+  --secondary: #fff9e6;
+  --secondary-foreground: #78350f;
+
+  --accent: #DAA520;
+  --accent-foreground: #451a03;
+
+  --muted: #f5f0eb;
+  --muted-foreground: #78716c;
+
+  --border: #e7e0d8;
+  --ring: #800000;
+  --destructive: #dc2626;
+  --radius: 0.75rem;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --ring: oklch(0.556 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --background: #140d0d;
+  --foreground: #fcf9f5;
+
+  --card: #1f1414;
+  --card-foreground: #fcf9f5;
+
+  --primary: #9b1c1c;
+  --primary-foreground: #ffffff;
+
+  --secondary: #2b1f0c;
+  --secondary-foreground: #FFDF00;
+
+  --accent: #DAA520;
+  --accent-foreground: #ffffff;
+
+  --muted: #2d1e1e;
+  --muted-foreground: #a8a29e;
+
+  --border: #3d2929;
+  --ring: #FFDF00;
+  --destructive: #ef4444;
 }
 
 @theme inline {
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Cinzel", Georgia, serif;
+
+  --color-pup-maroon: var(--pup-maroon);
+  --color-pup-maroon-dark: var(--pup-maroon-dark);
+  --color-pup-maroon-light: var(--pup-maroon-light);
+  --color-pup-gold: var(--pup-gold);
+  --color-pup-gold-dark: var(--pup-gold-dark);
+  --color-pup-gold-light: var(--pup-gold-light);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-ring: var(--ring);
   --color-destructive: var(--destructive);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -54,6 +97,22 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased font-sans;
   }
+}
+
+/* Custom scrollbar for academic chat feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 0, 0, 0.2);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 0, 0, 0.4);
 }
