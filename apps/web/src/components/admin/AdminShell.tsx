@@ -15,10 +15,10 @@ const items = [
 ]
 
 const pageDetails: Record<AdminPage, { title: string; description: string }> = {
-  overview: { title: "Administration overview", description: "Monitor and manage your classroom workspace." },
-  accounts: { title: "Account management", description: "Create and review student, professor, and administrator accounts." },
-  subjects: { title: "Subject chat management", description: "Create subject conversations and review their members." },
-  import: { title: "Excel import", description: "Provision accounts, subject chats, and enrollments in bulk." },
+  overview: { title: "Overview", description: "A quick look at your classroom workspace." },
+  accounts: { title: "Accounts", description: "Create and review school accounts." },
+  subjects: { title: "Subject chats", description: "Create conversations and review their members." },
+  import: { title: "Excel import", description: "Create accounts and subject enrollments in bulk." },
 }
 
 type Props = {
@@ -43,22 +43,20 @@ export function AdminShell({ session, page, onNavigate, children }: Props) {
   }
 
   return (
-    <main className="min-h-svh bg-[#fbfaf8] text-foreground">
-      <header className="border-b-2 border-[#DAA520] bg-[#FFFFFF] shadow-sm">
-        <div className="mx-auto flex min-h-16 max-w-7xl items-center gap-3 px-4 py-3 md:px-6">
-          <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-[#800000] text-white ring-2 ring-[#DAA520]/40">
+    <main className="h-svh bg-background text-foreground md:grid md:grid-cols-[280px_1fr]">
+      <aside className="hidden min-h-0 border-r bg-muted/30 md:flex md:flex-col">
+        <div className="flex h-16 items-center gap-3 border-b px-5">
+          <div className="grid size-9 place-items-center rounded-lg bg-primary text-primary-foreground">
             <ShieldCheck className="size-5" />
           </div>
-          <div className="min-w-0">
-            <p className="font-semibold leading-tight text-[#800000]">Classroom Admin</p>
-            <p className="truncate text-xs text-[#800000]/60">{session.user.email}</p>
+          <div>
+            <p className="font-semibold leading-tight">Classroom</p>
+            <p className="text-xs text-muted-foreground">Administration</p>
           </div>
-          <Button className="ml-auto text-[#800000] hover:bg-[#DAA520]/15" variant="ghost" size="icon" aria-label="Sign out" onClick={() => void signOut()}>
-            <LogOut className="size-4" />
-          </Button>
         </div>
 
-        <nav className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 pb-3 md:px-6" aria-label="Admin pages">
+        <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label="Admin pages">
+          <p className="px-2 pb-2 pt-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Manage</p>
           {items.map((item) => {
             const Icon = item.icon
             const active = item.page === page
@@ -69,10 +67,10 @@ export function AdminShell({ session, page, onNavigate, children }: Props) {
                 onClick={(event) => follow(event, item.page)}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                   active
-                    ? "bg-[#800000] text-white"
-                    : "text-[#800000]/70 hover:bg-[#DAA520]/15 hover:text-[#800000]",
+                    ? "bg-primary font-medium text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
                 <Icon className="size-4" />
@@ -81,16 +79,47 @@ export function AdminShell({ session, page, onNavigate, children }: Props) {
             )
           })}
         </nav>
-      </header>
 
-      <div className="mx-auto max-w-7xl px-4 py-6 md:px-6 md:py-8">
-        <div className="mb-6">
-          <p className="text-sm font-medium text-[#DAA520]">Administration</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight text-[#800000]">{details.title}</h1>
-          <p className="mt-2 text-sm text-[#800000]/65">{details.description}</p>
+        <div className="flex items-center gap-3 border-t p-4">
+          <div className="grid size-9 shrink-0 place-items-center rounded-full bg-muted text-sm font-semibold">
+            {session.user.email?.[0]?.toUpperCase() ?? "A"}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium">Administrator</p>
+            <p className="truncate text-xs text-muted-foreground">{session.user.email}</p>
+          </div>
+          <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => void signOut()}>
+            <LogOut className="size-4" />
+          </Button>
         </div>
-        {children}
-      </div>
+      </aside>
+
+      <section className="flex min-h-0 flex-col">
+        <header className="flex min-h-16 items-center gap-3 border-b px-4 md:px-6">
+          <div className="grid size-9 place-items-center rounded-lg bg-primary text-primary-foreground md:hidden">
+            <ShieldCheck className="size-4" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="truncate font-semibold">{details.title}</h1>
+            <p className="truncate text-xs text-muted-foreground">{details.description}</p>
+          </div>
+          <select
+            className="ml-auto h-9 max-w-36 rounded-md border bg-background px-2 text-sm md:hidden"
+            value={page}
+            aria-label="Admin page"
+            onChange={(event) => onNavigate(event.target.value as AdminPage)}
+          >
+            {items.map((item) => <option key={item.page} value={item.page}>{item.label}</option>)}
+          </select>
+          <Button className="md:hidden" variant="ghost" size="icon" aria-label="Sign out" onClick={() => void signOut()}>
+            <LogOut className="size-4" />
+          </Button>
+        </header>
+
+        <div className="flex-1 overflow-y-auto bg-muted/20 p-4 md:p-6">
+          <div className="mx-auto max-w-6xl">{children}</div>
+        </div>
+      </section>
     </main>
   )
 }
