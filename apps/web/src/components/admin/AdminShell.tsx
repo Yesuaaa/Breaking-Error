@@ -43,20 +43,20 @@ export function AdminShell({ session, page, onNavigate, children }: Props) {
   }
 
   return (
-    <main className="h-svh bg-background text-foreground md:grid md:grid-cols-[280px_1fr]">
-      <aside className="hidden min-h-0 border-r bg-muted/30 md:flex md:flex-col">
-        <div className="flex h-16 items-center gap-3 border-b px-5">
-          <div className="grid size-9 place-items-center rounded-lg bg-primary text-primary-foreground">
+    <main className="h-svh bg-[#fbf9f6] text-[#1c1917] md:grid md:grid-cols-[280px_1fr]">
+      <aside className="hidden min-h-0 border-r border-[#e7e0d8] bg-[#fffdfa] md:flex md:flex-col">
+        <div className="flex h-16 items-center gap-3 border-b border-[#e7e0d8] px-5">
+          <div className="grid size-9 place-items-center rounded-lg bg-gradient-to-br from-[#800000] to-[#550000] text-[#FFDF00] shadow-sm ring-1 ring-[#DAA520]/40">
             <ShieldCheck className="size-5" />
           </div>
           <div>
-            <p className="font-semibold leading-tight">Classroom</p>
-            <p className="text-xs text-muted-foreground">Administration</p>
+            <p className="font-bold leading-tight text-[#800000]">Syncademia</p>
+            <p className="text-xs text-[#78716c]">Administration</p>
           </div>
         </div>
 
         <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label="Admin pages">
-          <p className="px-2 pb-2 pt-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Manage</p>
+          <p className="px-2 pb-2 pt-1 text-xs font-bold uppercase tracking-wider text-[#800000]/65">Manage</p>
           {items.map((item) => {
             const Icon = item.icon
             const active = item.page === page
@@ -69,8 +69,8 @@ export function AdminShell({ session, page, onNavigate, children }: Props) {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
                   active
-                    ? "bg-primary font-medium text-primary-foreground"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    ? "bg-[#800000] font-semibold text-white shadow-sm ring-1 ring-[#DAA520]/40"
+                    : "text-[#78716c] hover:bg-[#800000]/5 hover:text-[#800000]",
                 )}
               >
                 <Icon className="size-4" />
@@ -80,43 +80,43 @@ export function AdminShell({ session, page, onNavigate, children }: Props) {
           })}
         </nav>
 
-        <div className="flex items-center gap-3 border-t p-4">
-          <div className="grid size-9 shrink-0 place-items-center rounded-full bg-muted text-sm font-semibold">
+        <div className="flex items-center gap-3 border-t border-[#e7e0d8] p-4">
+          <div className="grid size-9 shrink-0 place-items-center rounded-full bg-[#800000] text-sm font-bold text-[#FFDF00] ring-2 ring-[#DAA520]/30">
             {session.user.email?.[0]?.toUpperCase() ?? "A"}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium">Administrator</p>
-            <p className="truncate text-xs text-muted-foreground">{session.user.email}</p>
+            <p className="text-sm font-semibold text-[#800000]">Administrator</p>
+            <p className="truncate text-xs text-[#78716c]">{session.user.email}</p>
           </div>
-          <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => void signOut()}>
+          <Button variant="ghost" size="icon" aria-label="Sign out" onClick={() => void signOut()} className="text-[#800000] hover:bg-[#800000]/10 hover:text-[#680000]">
             <LogOut className="size-4" />
           </Button>
         </div>
       </aside>
 
       <section className="flex min-h-0 flex-col">
-        <header className="flex min-h-16 items-center gap-3 border-b px-4 md:px-6">
-          <div className="grid size-9 place-items-center rounded-lg bg-primary text-primary-foreground md:hidden">
+        <header className="flex min-h-16 items-center gap-3 border-b border-[#660000] bg-gradient-to-r from-[#800000] via-[#730000] to-[#550000] px-4 text-white shadow-sm md:px-6">
+          <div className="grid size-9 place-items-center rounded-lg bg-white/10 text-[#FFDF00] ring-1 ring-[#DAA520]/50 md:hidden">
             <ShieldCheck className="size-4" />
           </div>
           <div className="min-w-0">
-            <h1 className="truncate font-semibold">{details.title}</h1>
-            <p className="truncate text-xs text-muted-foreground">{details.description}</p>
+            <h1 className="truncate font-bold">{details.title}</h1>
+            <p className="truncate text-xs text-[#FFDF00]/85">{details.description}</p>
           </div>
           <select
-            className="ml-auto h-9 max-w-36 rounded-md border bg-background px-2 text-sm md:hidden"
+            className="ml-auto h-9 max-w-36 rounded-md border border-[#DAA520]/60 bg-white px-2 text-sm text-[#800000] outline-none md:hidden"
             value={page}
             aria-label="Admin page"
             onChange={(event) => onNavigate(event.target.value as AdminPage)}
           >
             {items.map((item) => <option key={item.page} value={item.page}>{item.label}</option>)}
           </select>
-          <Button className="md:hidden" variant="ghost" size="icon" aria-label="Sign out" onClick={() => void signOut()}>
+          <Button className="text-white hover:bg-white/15 hover:text-white md:hidden" variant="ghost" size="icon" aria-label="Sign out" onClick={() => void signOut()}>
             <LogOut className="size-4" />
           </Button>
         </header>
 
-        <div className="flex-1 overflow-y-auto bg-muted/20 p-4 md:p-6">
+        <div className="flex-1 overflow-y-auto bg-gradient-to-b from-[#f7f3ed] to-[#fffdfa] p-4 md:p-6">
           <div className="mx-auto max-w-6xl">{children}</div>
         </div>
       </section>

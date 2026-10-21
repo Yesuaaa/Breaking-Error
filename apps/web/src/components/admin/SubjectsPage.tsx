@@ -34,26 +34,26 @@ export function SubjectsPage({ overview, onChanged, onSuccess, onError }: Props)
       <form onSubmit={submit} className={panelClass}>
         <SectionHeading title="Create a subject chat" description="Create one group conversation for a subject, section, and term." />
         <div className="grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-4">
-          <label className="text-sm font-medium">Subject code<input className={fieldClass} name="code" placeholder="CS101" required /></label>
-          <label className="text-sm font-medium lg:col-span-2">Subject name<input className={fieldClass} name="name" placeholder="Introduction to Computer Science" required /></label>
-          <label className="text-sm font-medium">Section<input className={fieldClass} name="section" placeholder="BSCS 1-A" required /></label>
-          <label className="text-sm font-medium sm:col-span-2 lg:col-span-4">Term<input className={fieldClass} name="term" placeholder="1st Semester 2026-2027" required /></label>
+          <label className="text-sm font-medium text-[#44403c]">Subject code<input className={fieldClass} name="code" placeholder="CS101" required /></label>
+          <label className="text-sm font-medium text-[#44403c] lg:col-span-2">Subject name<input className={fieldClass} name="name" placeholder="Introduction to Computer Science" required /></label>
+          <label className="text-sm font-medium text-[#44403c]">Section<input className={fieldClass} name="section" placeholder="BSCS 1-A" required /></label>
+          <label className="text-sm font-medium text-[#44403c] sm:col-span-2 lg:col-span-4">Term<input className={fieldClass} name="term" placeholder="1st Semester 2026-2027" required /></label>
         </div>
-        <div className="border-t px-5 py-4"><Button className={actionClass} type="submit" disabled={busy}><GraduationCap className="size-4" /> {busy ? "Creating…" : "Create subject chat"}</Button></div>
+        <div className="border-t border-[#eee7df] px-5 py-4"><Button className={actionClass} type="submit" disabled={busy}><GraduationCap className="size-4" /> {busy ? "Creating…" : "Create subject chat"}</Button></div>
       </form>
 
       <section className={`${panelClass} overflow-hidden`}>
         <SectionHeading title="All subject chats" description={`${overview.subjects.length} conversations`} action={<SearchField value={query} onChange={setQuery} placeholder="Search subjects" />} />
         <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-3">
           {filtered.map((subject) => (
-            <article key={subject.id} className="rounded-lg border p-4 transition-colors hover:bg-muted/30">
-              <div className="flex items-start gap-3"><div className="grid size-10 shrink-0 place-items-center rounded-lg bg-muted"><BookOpen className="size-5" /></div><div className="min-w-0"><p className="font-semibold">{subject.code}</p><p className="truncate text-sm text-muted-foreground">{subject.name}</p></div></div>
-              <dl className="mt-4 grid grid-cols-2 gap-3 rounded-md bg-muted/60 p-3 text-xs"><div><dt className="text-muted-foreground">Section</dt><dd className="mt-1 font-medium">{subject.section}</dd></div><div><dt className="text-muted-foreground">Term</dt><dd className="mt-1 truncate font-medium">{subject.term}</dd></div></dl>
-              <p className="mt-4 flex items-center gap-1.5 text-sm text-muted-foreground"><Users className="size-4" /> {subject.memberships.length} members</p>
+            <article key={subject.id} className="rounded-lg border border-[#e7e0d8] p-4 transition-colors hover:border-[#DAA520] hover:bg-[#fffdf0]">
+              <div className="flex items-start gap-3"><div className="grid size-10 shrink-0 place-items-center rounded-lg bg-[#800000]/10 text-[#800000]"><BookOpen className="size-5" /></div><div className="min-w-0"><p className="font-bold text-[#800000]">{subject.code}</p><p className="truncate text-sm text-[#78716c]">{subject.name}</p></div></div>
+              <dl className="mt-4 grid grid-cols-2 gap-3 rounded-md bg-[#f7f3ed] p-3 text-xs"><div><dt className="text-[#78716c]">Section</dt><dd className="mt-1 font-semibold text-[#292524]">{subject.section}</dd></div><div><dt className="text-[#78716c]">Term</dt><dd className="mt-1 truncate font-semibold text-[#292524]">{subject.term}</dd></div></dl>
+              <p className="mt-4 flex items-center gap-1.5 text-sm text-[#78716c]"><Users className="size-4 text-[#DAA520]" /> {subject.memberships.length} members</p>
             </article>
           ))}
         </div>
-        {!filtered.length && <p className="px-5 py-10 text-center text-sm text-muted-foreground">No subject chats match your search.</p>}
+        {!filtered.length && <p className="px-5 py-10 text-center text-sm text-[#78716c]">No subject chats match your search.</p>}
       </section>
     </div>
   )
