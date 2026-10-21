@@ -2,9 +2,6 @@ import type { FormEvent } from "react"
 import { useEffect, useRef, useState } from "react"
 import type { Session } from "@supabase/supabase-js"
 import {
-  Award,
-  Bell,
-  Binary,
   BookOpen,
   Briefcase,
   Calculator,
@@ -15,30 +12,24 @@ import {
   Database,
   FlaskConical,
   GraduationCap,
-  Hash,
   HeartPulse,
   History,
   Info,
   Languages,
   Laptop,
-  Lightbulb,
   LineChart,
   LogOut,
   Megaphone,
   MessageSquare,
-  Music,
   Palette,
   Scale,
   Search,
   Send,
-  ShieldAlert,
   Sparkles,
-  Stethoscope,
-  Terminal,
-  User,
   Users,
 } from "lucide-react"
 import { AdminDashboard } from "@/components/AdminDashboard"
+import { CourseContent } from "@/components/CourseContent"
 import { Button } from "@/components/ui/button"
 import { api, type Message, type Profile, type Subject } from "@/lib/api"
 import { supabase } from "@/lib/supabase"
@@ -270,6 +261,7 @@ function Workspace({ session, profile }: { session: Session; profile: Profile | 
   const [error, setError] = useState("")
   const [sending, setSending] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [workspaceView, setWorkspaceView] = useState<"discussion" | "tasks" | "materials">("discussion")
   const endRef = useRef<HTMLDivElement>(null)
 
   const selected = subjects.find((subject) => subject.id === selectedId)
@@ -526,6 +518,33 @@ function Workspace({ session, profile }: { session: Session; profile: Profile | 
             </div>
           </header>
 
+          {selected && (
+            <nav className="flex shrink-0 items-center gap-1 border-b border-[#e7e0d8] bg-white px-4 py-2 md:px-6" aria-label="Subject sections">
+              {([
+                ["discussion", "Discussion", MessageSquare],
+                ["tasks", "Tasks", CheckCircle2],
+                ["materials", "Materials", BookOpen],
+              ] as const).map(([value, label, Icon]) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setWorkspaceView(value)}
+                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-colors sm:text-sm ${
+                    workspaceView === value
+                      ? "bg-[#800000] text-white shadow-sm"
+                      : "text-[#78716c] hover:bg-[#800000]/5 hover:text-[#800000]"
+                  }`}
+                >
+                  <Icon className="size-4" />
+                  {label}
+                </button>
+              ))}
+            </nav>
+          )}
+
+          {workspaceView === "discussion" ? (
+            <>
+
           {/* Academic Announcement / Guidelines Banner */}
           <div className="border-b border-[#f2ece3] bg-gradient-to-r from-[#fff9e6] via-[#fffdf5] to-[#fff9e6] px-4 py-2 text-xs text-[#78350f]">
             <div className="mx-auto flex max-w-4xl items-center gap-2">
@@ -647,6 +666,16 @@ function Workspace({ session, profile }: { session: Session; profile: Profile | 
             </form>
             {error && <p className="mx-auto mt-2 max-w-3xl text-center text-xs text-red-600">{error}</p>}
           </footer>
+            </>
+          ) : selected ? (
+            <CourseContent
+              subject={selected}
+              view={workspaceView}
+              isProfessor={selected.role === "PROFESSOR"}
+            />
+          ) : (
+            <div className="grid flex-1 place-items-center text-sm text-[#78716c]">Select a subject first.</div>
+          )}
         </section>
       </div>
     </div>

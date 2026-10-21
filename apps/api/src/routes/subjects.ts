@@ -7,6 +7,22 @@ const createMessageSchema = z.object({
   content: z.string().trim().min(1).max(4000),
 })
 
+const createTaskSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(4000).optional(),
+  dueAt: z.string().datetime().nullable().optional(),
+  points: z.number().int().min(0).max(10000).nullable().optional(),
+})
+
+const createMaterialSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  description: z.string().trim().max(4000).optional(),
+  url: z.string().trim().url().max(2048).refine(
+    (url) => ["http:", "https:"].includes(new URL(url).protocol),
+    "Only HTTP and HTTPS links are supported",
+  ),
+})
+
 export const subjectsRouter = Router()
 
 subjectsRouter.use(requireAuth)
@@ -94,4 +110,175 @@ subjectsRouter.post("/:subjectId/messages", async (request, response) => {
   })
 
   response.status(201).json(message)
+})
+
+subjectsRouter.get("/:subjectId/tasks", async (request, response) => {
+  const { userId } = request
+  const subjectId = z.string().uuid().parse(request.params.subjectId)
+  const membership = await prisma.membership.findUnique({
+    where: { profileId_subjectId: { profileId: userId, subjectId } },
+  })
+
+  if (!membership) {
+    response.status(403).json({ error: "You are not enrolled in this subject" })
+    return
+  }
+
+  const tasks = await prisma.task.findMany({
+    where: { subjectId },
+    orderBy: [{ dueAt: { sort: "asc", nulls: "last" } }, { createdAt: "desc" }],
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      dueAt: true,
+      points: true,
+      createdAt: true,
+      creator: { select: { id: true, name: true } },
+    },
+  })
+
+  response.json(tasks)
+})
+
+subjectsRouter.post("/:subjectId/tasks", async (request, response) => {
+  const { userId } = request
+  const subjectId = z.string().uuid().parse(request.params.subjectId)
+  const input = createTaskSchema.parse(request.body)
+  const membership = await prisma.membership.findUnique({
+    where: { profileId_subjectId: { profileId: userId, subjectId } },
+  })
+
+  if (membership?.role !== "PROFESSOR") {
+    response.status(403).json({ error: "Only a professor assigned to this subject can add tasks" })
+    return
+  }
+
+  const task = await prisma.task.create({
+    data: {
+      title: input.title,
+      description: input.description || null,
+      dueAt: input.dueAt ? new Date(input.dueAt) : null,
+      points: input.points ?? null,
+      subjectId,
+      creatorId: userId,
+    },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      dueAt: true,
+      points: true,
+      createdAt: true,
+      creator: { select: { id: true, name: true } },
+    },
+  })
+
+  response.status(201).json(task)
+})
+
+subjectsRouter.delete("/:subjectId/tasks/:taskId", async (request, response) => {
+  const { userId } = request
+  const subjectId = z.string().uuid().parse(request.params.subjectId)
+  const taskId = z.string().uuid().parse(request.params.taskId)
+  const membership = await prisma.membership.findUnique({
+    where: { profileId_subjectId: { profileId: userId, subjectId } },
+  })
+
+  if (membership?.role !== "PROFESSOR") {
+    response.status(403).json({ error: "Only a professor assigned to this subject can delete tasks" })
+    return
+  }
+
+  const result = await prisma.task.deleteMany({ where: { id: taskId, subjectId } })
+  if (result.count === 0) {
+    response.status(404).json({ error: "Task not found" })
+    return
+  }
+
+  response.json({ id: taskId })
+})
+
+subjectsRouter.get("/:subjectId/materials", async (request, response) => {
+  const { userId } = request
+  const subjectId = z.string().uuid().parse(request.params.subjectId)
+  const membership = await prisma.membership.findUnique({
+    where: { profileId_subjectId: { profileId: userId, subjectId } },
+  })
+
+  if (!membership) {
+    response.status(403).json({ error: "You are not enrolled in this subject" })
+    return
+  }
+
+  const materials = await prisma.learningMaterial.findMany({
+    where: { subjectId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      url: true,
+      createdAt: true,
+      creator: { select: { id: true, name: true } },
+    },
+  })
+
+  response.json(materials)
+})
+
+subjectsRouter.post("/:subjectId/materials", async (request, response) => {
+  const { userId } = request
+  const subjectId = z.string().uuid().parse(request.params.subjectId)
+  const input = createMaterialSchema.parse(request.body)
+  const membership = await prisma.membership.findUnique({
+    where: { profileId_subjectId: { profileId: userId, subjectId } },
+  })
+
+  if (membership?.role !== "PROFESSOR") {
+    response.status(403).json({ error: "Only a professor assigned to this subject can add materials" })
+    return
+  }
+
+  const material = await prisma.learningMaterial.create({
+    data: {
+      title: input.title,
+      description: input.description || null,
+      url: input.url,
+      subjectId,
+      creatorId: userId,
+    },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      url: true,
+      createdAt: true,
+      creator: { select: { id: true, name: true } },
+    },
+  })
+
+  response.status(201).json(material)
+})
+
+subjectsRouter.delete("/:subjectId/materials/:materialId", async (request, response) => {
+  const { userId } = request
+  const subjectId = z.string().uuid().parse(request.params.subjectId)
+  const materialId = z.string().uuid().parse(request.params.materialId)
+  const membership = await prisma.membership.findUnique({
+    where: { profileId_subjectId: { profileId: userId, subjectId } },
+  })
+
+  if (membership?.role !== "PROFESSOR") {
+    response.status(403).json({ error: "Only a professor assigned to this subject can delete materials" })
+    return
+  }
+
+  const result = await prisma.learningMaterial.deleteMany({ where: { id: materialId, subjectId } })
+  if (result.count === 0) {
+    response.status(404).json({ error: "Learning material not found" })
+    return
+  }
+
+  response.json({ id: materialId })
 })

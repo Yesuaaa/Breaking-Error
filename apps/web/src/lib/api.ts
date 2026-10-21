@@ -42,6 +42,25 @@ export type Message = {
   author: { id: string; name: string | null }
 }
 
+export type SubjectTask = {
+  id: string
+  title: string
+  description: string | null
+  dueAt: string | null
+  points: number | null
+  createdAt: string
+  creator: { id: string; name: string | null }
+}
+
+export type LearningMaterial = {
+  id: string
+  title: string
+  description: string | null
+  url: string
+  createdAt: string
+  creator: { id: string; name: string | null }
+}
+
 export type Profile = {
   id: string
   email: string
@@ -84,6 +103,31 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ content }),
     }),
+  tasks: (subjectId: string) =>
+    request<SubjectTask[]>(`/subjects/${subjectId}/tasks`),
+  createTask: (subjectId: string, input: {
+    title: string
+    description?: string
+    dueAt?: string | null
+    points?: number | null
+  }) => request<SubjectTask>(`/subjects/${subjectId}/tasks`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  }),
+  deleteTask: (subjectId: string, taskId: string) =>
+    request<{ id: string }>(`/subjects/${subjectId}/tasks/${taskId}`, { method: "DELETE" }),
+  materials: (subjectId: string) =>
+    request<LearningMaterial[]>(`/subjects/${subjectId}/materials`),
+  createMaterial: (subjectId: string, input: {
+    title: string
+    description?: string
+    url: string
+  }) => request<LearningMaterial>(`/subjects/${subjectId}/materials`, {
+    method: "POST",
+    body: JSON.stringify(input),
+  }),
+  deleteMaterial: (subjectId: string, materialId: string) =>
+    request<{ id: string }>(`/subjects/${subjectId}/materials/${materialId}`, { method: "DELETE" }),
   adminOverview: () => request<AdminOverview>("/admin/overview"),
   createSubject: (input: { code: string; name: string; section: string; term: string }) =>
     request<AdminSubject>("/admin/subjects", { method: "POST", body: JSON.stringify(input) }),

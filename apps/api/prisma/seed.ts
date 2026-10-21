@@ -150,6 +150,68 @@ async function main() {
     })
   }
 
+  const taskCount = await prisma.task.count()
+  if (taskCount === 0) {
+    const oneWeekFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+    await prisma.task.createMany({
+      data: [
+        {
+          subjectId: computerScience.id,
+          creatorId: professor.id,
+          title: "Programming fundamentals exercise",
+          description: "Complete the variables, conditionals, and loops exercises discussed in class.",
+          dueAt: oneWeekFromNow,
+          points: 50,
+        },
+        {
+          subjectId: mathematics.id,
+          creatorId: professor.id,
+          title: "Problem Set 1",
+          description: "Answer the assigned logic and set theory problems. Show your solution process.",
+          dueAt: oneWeekFromNow,
+          points: 100,
+        },
+        {
+          subjectId: communication.id,
+          creatorId: professor.id,
+          title: "Presentation outline",
+          description: "Prepare a one-page outline for your individual academic presentation.",
+          dueAt: oneWeekFromNow,
+          points: 25,
+        },
+      ],
+    })
+  }
+
+  const materialCount = await prisma.learningMaterial.count()
+  if (materialCount === 0) {
+    await prisma.learningMaterial.createMany({
+      data: [
+        {
+          subjectId: computerScience.id,
+          creatorId: professor.id,
+          title: "JavaScript learning guide",
+          description: "Supplementary lessons and examples for our programming fundamentals topics.",
+          url: "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting",
+        },
+        {
+          subjectId: mathematics.id,
+          creatorId: professor.id,
+          title: "Discrete mathematics reference",
+          description: "Use this as an additional reference for definitions and worked examples.",
+          url: "https://mathworld.wolfram.com/DiscreteMathematics.html",
+        },
+        {
+          subjectId: communication.id,
+          creatorId: professor.id,
+          title: "Academic writing resources",
+          description: "Writing guidance and citation resources for your course outputs.",
+          url: "https://owl.purdue.edu/owl/general_writing/academic_writing/index.html",
+        },
+      ],
+    })
+  }
+
   console.log("Demo data seeded successfully.")
   console.log(`Admin: ${adminEmail} / ${adminPassword}`)
   console.log(`Professor: ${professorEmail} / ${professorPassword}`)
