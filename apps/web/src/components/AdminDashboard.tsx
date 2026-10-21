@@ -79,7 +79,7 @@ export function AdminDashboard({ session }: { session: Session }) {
           className={`mb-6 rounded-lg border px-4 py-3 text-sm ${
             error
               ? "border-destructive/40 bg-destructive/10 text-destructive"
-              : "border-[#DAA520]/50 bg-[#DAA520]/10 text-[#800000]"
+              : "bg-card text-foreground"
           }`}
         >
           {error || notice}
@@ -87,7 +87,7 @@ export function AdminDashboard({ session }: { session: Session }) {
       )}
 
       {loading && !overview ? (
-        <div className="grid min-h-72 place-items-center rounded-xl border border-[#800000]/15 bg-white text-sm text-[#800000]/60">
+        <div className="grid min-h-72 place-items-center rounded-xl border bg-card text-sm text-muted-foreground">
           Loading administration data…
         </div>
       ) : page === "accounts" ? (
