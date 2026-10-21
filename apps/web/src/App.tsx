@@ -351,7 +351,7 @@ function Workspace({ session, profile }: { session: Session; profile: Profile | 
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <span className="font-extrabold tracking-tight text-white text-sm md:text-base">
-                PUP ClassNet
+                Syncademia
               </span>
               <span className="hidden rounded bg-[#FFDF00] px-1.5 py-0.5 text-[10px] font-black uppercase text-[#800000] sm:inline-block">
                 {isProfessor ? "Faculty Portal" : "Student Portal"}
