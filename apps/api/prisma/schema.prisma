@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Profile {
+  // Uses the same UUID as the user in Supabase Auth.
+  id          String       @id @db.Uuid
+  email       String       @unique
+  name        String?
+  accountRole AccountRole  @default(USER) @map("account_role")
+  memberships Membership[]
+  messages    Message[]
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@map("profiles")
+}
+
+model Subject {
+  id          String       @id @default(uuid()) @db.Uuid
+  code        String
+  name        String
+  section     String
+  term        String
+  memberships Membership[]
+  messages    Message[]
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@unique([code, section, term])
+  @@map("subjects")
+}
+
+model Membership {
+  id        String         @id @default(uuid()) @db.Uuid
+  role      MembershipRole
+  profileId String         @map("profile_id") @db.Uuid
+  subjectId String         @map("subject_id") @db.Uuid
+  profile   Profile        @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  subject   Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  @@unique([profileId, subjectId])
+  @@index([subjectId])
+  @@map("memberships")
+}
+
+model Message {
+  id        String   @id @default(uuid()) @db.Uuid
+  content   String   @db.VarChar(4000)
+  authorId  String   @map("author_id") @db.Uuid
+  subjectId String   @map("subject_id") @db.Uuid
+  author    Profile  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  subject   Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([subjectId, createdAt])
+  @@map("messages")
+}
+
+enum MembershipRole {
+  STUDENT
+  PROFESSOR
+}
+
+enum AccountRole {
+  USER
+  ADMIN
+}

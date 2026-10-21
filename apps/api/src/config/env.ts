@@ -1,0 +1,22 @@
+import "dotenv/config"
+import { z } from "zod"
+
+const schema = z.object({
+  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  PORT: z.coerce.number().int().positive().default(3000),
+  WEB_ORIGIN: z.string().url().default("http://localhost:5173"),
+  DATABASE_URL: z.string().min(1).optional(),
+  DIRECT_URL: z.string().min(1).optional(),
+  SUPABASE_URL: z.string().url().optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
+})
+
+const result = schema.safeParse(process.env)
+
+if (!result.success) {
+  console.error("Invalid environment variables", result.error.flatten().fieldErrors)
+  process.exit(1)
+}
+
+export const env = result.data
+
