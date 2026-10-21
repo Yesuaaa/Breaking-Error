@@ -255,7 +255,9 @@ function SignIn() {
 
 function Workspace({ session, profile }: { session: Session; profile: Profile | null | undefined }) {
   const [subjects, setSubjects] = useState<Subject[]>([])
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(() => {
+    return localStorage.getItem("syncademia_last_subject_id")
+  })
   const [messages, setMessages] = useState<Message[]>([])
   const [draft, setDraft] = useState("")
   const [error, setError] = useState("")
@@ -276,10 +278,20 @@ function Workspace({ session, profile }: { session: Session; profile: Profile | 
     api.subjects()
       .then((items) => {
         setSubjects(items)
-        setSelectedId((current) => current ?? items[0]?.id ?? null)
+        setSelectedId((current) => {
+          if (current && items.some((item) => item.id === current)) return current
+          const fallback = items[0]?.id ?? null
+          if (fallback) localStorage.setItem("syncademia_last_subject_id", fallback)
+          return fallback
+        })
       })
       .catch((cause: Error) => setError(cause.message))
   }, [])
+
+  function selectSubject(id: string) {
+    setSelectedId(id)
+    localStorage.setItem("syncademia_last_subject_id", id)
+  }
 
   useEffect(() => {
     if (!selectedId) return
@@ -425,7 +437,7 @@ function Workspace({ session, profile }: { session: Session; profile: Profile | 
                   <button
                     key={subject.id}
                     type="button"
-                    onClick={() => setSelectedId(subject.id)}
+                    onClick={() => selectSubject(subject.id)}
                     className={`group relative flex w-full flex-col gap-1 rounded-xl p-3 text-left transition-all ${
                       isActive
                         ? "bg-[#800000] text-white shadow-md shadow-[#800000]/20 ring-1 ring-[#FFDF00]/40"
@@ -684,27 +696,70 @@ function Workspace({ session, profile }: { session: Session; profile: Profile | 
 
 function App() {
   const [session, setSession] = useState<Session | null | undefined>(undefined)
-  const [profile, setProfile] = useState<Profile | null | undefined>(undefined)
+  const [profile, setProfile] = useState<Profile | null | undefined>(() => {
+    try {
+      const cached = localStorage.getItem("syncademia_cached_profile")
+      return cached ? JSON.parse(cached) : undefined
+    } catch {
+      return undefined
+    }
+  })
   const [profileError, setProfileError] = useState("")
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => setSession(data.session))
-    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession))
+    const { data } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      // If user signed out, clear cache and reset
+      if (event === "SIGNED_OUT" || !nextSession) {
+        localStorage.removeItem("syncademia_cached_profile")
+        localStorage.removeItem("syncademia_last_subject_id")
+        setSession(null)
+        setProfile(null)
+        return
+      }
+
+      setSession((prev) => {
+        // If it's the exact same access token, avoid unnecessary state trigger
+        if (prev?.access_token === nextSession.access_token) return prev
+        return nextSession
+      })
+    })
     return () => data.subscription.unsubscribe()
   }, [])
 
   useEffect(() => {
     if (!session) {
-      setProfile(null)
+      if (session === null) {
+        setProfile(null)
+      }
       return
     }
 
-    setProfile(undefined)
-    setProfileError("")
+    let active = true
+    // Fetch user profile silently without setting profile back to undefined (which caused screen flash)
     api.me()
-      .then(setProfile)
-      .catch((cause: Error) => setProfileError(cause.message))
-  }, [session])
+      .then((data) => {
+        if (!active) return
+        setProfile(data)
+        try {
+          localStorage.setItem("syncademia_cached_profile", JSON.stringify(data))
+        } catch {
+          // ignore storage error
+        }
+      })
+      .catch((cause: Error) => {
+        if (!active) return
+        // Only set error if we don't have a cached profile to keep app usable
+        setProfile((current) => {
+          if (!current) setProfileError(cause.message)
+          return current
+        })
+      })
+
+    return () => {
+      active = false
+    }
+  }, [session?.user?.id])
 
   if (session === undefined || (session && profile === undefined && !profileError)) {
     return (

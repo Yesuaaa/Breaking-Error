@@ -13,4 +13,11 @@ if (publishableKey.startsWith("sb_secret_")) {
   throw new Error("VITE_SUPABASE_PUBLISHABLE_KEY cannot contain a secret Supabase API key.")
 }
 
-export const supabase = createClient(url, publishableKey)
+export const supabase = createClient(url, publishableKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storage: window.localStorage,
+  },
+})
